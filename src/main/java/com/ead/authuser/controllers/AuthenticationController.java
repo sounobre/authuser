@@ -3,10 +3,7 @@ package com.ead.authuser.controllers;
 import com.ead.authuser.dtos.UserRecordDto;
 import com.ead.authuser.services.UserService;
 import com.fasterxml.jackson.annotation.JsonView;
-
 import lombok.extern.log4j.Log4j2;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
