@@ -5,6 +5,7 @@ import com.ead.authuser.models.UserModel;
 import com.ead.authuser.services.UserService;
 import com.ead.authuser.specifications.SpecificationTemplate;
 import com.fasterxml.jackson.annotation.JsonView;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import java.util.UUID;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+@Log4j2
 @RestController
 @RequestMapping("/users")
 //@CrossOrigin(origins = "http://exemplo.com", maxAge = 3600)
@@ -47,6 +49,7 @@ public class UserController {
 
     @DeleteMapping("{userId}")
     public ResponseEntity<Object> deleteUser(@PathVariable(value = "userId") UUID userID) {
+        log.debug("DELETE deleteUser received {}", userID);
         userService.delete(userService.findById(userID).get());
 
         return ResponseEntity.status(HttpStatus.OK).body("User deleted successfully.");
@@ -57,6 +60,7 @@ public class UserController {
                                              @RequestBody @Validated(UserRecordDto.UserView.UserPut.class)
                                              @JsonView(UserRecordDto.UserView.UserPut.class) UserRecordDto userRecordDto) {
 
+        log.debug("PUT updateUser received {}", userRecordDto);
         return ResponseEntity.status(HttpStatus.OK).body(
                 userService.updateUser(userRecordDto, userService.findById(userID).get()
                 ));
@@ -67,8 +71,11 @@ public class UserController {
                                                  @RequestBody @Validated(UserRecordDto.UserView.PasswordPut.class)
                                                  @JsonView(UserRecordDto.UserView.PasswordPut.class) UserRecordDto userRecordDto) {
 
+        log.debug("PUT updatePassword received {}", userID);
+
         Optional<UserModel> userModelOptional = userService.findById(userID);
         if (!userModelOptional.get().getPassword().equals(userRecordDto.oldPassword())) {
+            log.warn("Mismatched old password! userId: {}", userID);
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: Mismatched old password.");
         }
         userService.updatePassword(userRecordDto, userModelOptional.get());
@@ -76,10 +83,10 @@ public class UserController {
     }
 
     @PutMapping("/{userID}/image")
-    public ResponseEntity<Object> updateImagem(@PathVariable(value = "userID") UUID userID,
+    public ResponseEntity<Object> updateImage(@PathVariable(value = "userID") UUID userID,
                                                @RequestBody @Validated(UserRecordDto.UserView.ImagePut.class)
                                                @JsonView(UserRecordDto.UserView.ImagePut.class) UserRecordDto userRecordDto) {
-
+        log.debug("PUT updateImage UserRecordDto received {}", userRecordDto);
         return ResponseEntity.status(HttpStatus.OK).body(userService.updateImage(userRecordDto, userService.findById(userID).get()));
     }
 }

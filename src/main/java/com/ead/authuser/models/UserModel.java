@@ -19,8 +19,7 @@ import java.util.UUID;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
 @Table(name = "TB_USERS")
-@Getter
-@Setter
+@Data
 public class UserModel extends RepresentationModel<UserModel> implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -63,6 +62,5 @@ public class UserModel extends RepresentationModel<UserModel> implements Seriali
    // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     @Column(nullable = false)
     private LocalDateTime lastUpdateDate;
-
 
 }
