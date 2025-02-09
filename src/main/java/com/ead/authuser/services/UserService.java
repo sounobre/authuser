@@ -14,8 +14,8 @@ import java.util.UUID;
 
 public interface UserService {
 
-    List<UserModel> findAll( Pageable pageable);
-    Optional<UserModel> findById(UUID userID);
+    List<UserModel> findAll();
+    Optional<UserModel> findById(UUID userId);
     void delete(UserModel userModel);
     UserModel registerUser(UserRecordDto userRecordDto);
     boolean existsByUsername(String username);
@@ -24,4 +24,5 @@ public interface UserService {
     UserModel updatePassword(UserRecordDto userRecordDto, UserModel userModel);
     UserModel updateImage(UserRecordDto userRecordDto, UserModel userModel);
     Page<UserModel> findAll(Specification<UserModel> spec, Pageable pageable);
+    UserModel registerInstructor(UserModel userModel);
 }

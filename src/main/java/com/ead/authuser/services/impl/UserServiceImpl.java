@@ -1,10 +1,13 @@
 package com.ead.authuser.services.impl;
 
+import com.ead.authuser.clients.CourseClient;
 import com.ead.authuser.dtos.UserRecordDto;
 import com.ead.authuser.enums.UserStatus;
 import com.ead.authuser.enums.UserType;
 import com.ead.authuser.exceptions.NotFoundException;
+import com.ead.authuser.models.UserCourseModel;
 import com.ead.authuser.models.UserModel;
+import com.ead.authuser.repositories.UserCourseRepository;
 import com.ead.authuser.repositories.UserRepository;
 import com.ead.authuser.services.UserService;
 import com.ead.authuser.specifications.SpecificationTemplate;
@@ -13,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.time.LocalDateTime;
@@ -25,28 +29,42 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     final UserRepository userRepository;
+    final UserCourseRepository userCourseRepository;
+    final CourseClient courseClient;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, UserCourseRepository userCourseRepository, CourseClient courseClient) {
         this.userRepository = userRepository;
+        this.userCourseRepository = userCourseRepository;
+        this.courseClient = courseClient;
     }
 
     @Override
-    public List<UserModel> findAll(Pageable pageable) {
-       return userRepository.findAll();
+    public List<UserModel> findAll() {
+        return userRepository.findAll();
     }
 
     @Override
-    public Optional<UserModel> findById(UUID userID) {
-        Optional<UserModel> userModelOptional = userRepository.findById(userID);
-        if (userModelOptional.isEmpty()) {
-            throw new NotFoundException("Error: User not found");
+    public Optional<UserModel> findById(UUID userId) {
+        Optional<UserModel> userModelOptional = userRepository.findById(userId);
+        if(userModelOptional.isEmpty()){
+            throw new NotFoundException("Error: User not found.");
         }
         return userModelOptional;
     }
 
+    @Transactional
     @Override
     public void delete(UserModel userModel) {
+        boolean deleteUserCourseInCourse = false;
+        List<UserCourseModel> userCourseModelList = userCourseRepository.findAllUserCourseIntoUser(userModel.getUserId());
+        if(!userCourseModelList.isEmpty()){
+            userCourseRepository.deleteAll(userCourseModelList);
+            deleteUserCourseInCourse = true;
+        }
         userRepository.delete(userModel);
+        if(deleteUserCourseInCourse){
+            courseClient.deleteUserCourseInCourse(userModel.getUserId());
+        }
     }
 
     @Override
@@ -82,8 +100,7 @@ public class UserServiceImpl implements UserService {
     public UserModel updatePassword(UserRecordDto userRecordDto, UserModel userModel) {
         userModel.setPassword(userRecordDto.password());
         userModel.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
-        userRepository.save(userModel);
-        return userModel;
+        return userRepository.save(userModel);
     }
 
     @Override
@@ -98,5 +115,13 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll(spec, pageable);
     }
 
-
+    @Override
+    public UserModel registerInstructor(UserModel userModel) {
+        userModel.setUserType(UserType.INSTRUCTOR);
+        userModel.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
+        return userRepository.save(userModel);
+    }
 }
+
+
+

@@ -27,10 +27,10 @@ public class UserModel extends RepresentationModel<UserModel> implements Seriali
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID userId;
 
-    @Column(unique = true, nullable = false, length = 50)
+    @Column(nullable = false, unique = true, length = 50)
     private String username;
 
-    @Column(unique = true, nullable = false, length = 50)
+    @Column(nullable = false, unique = true, length = 50)
     private String email;
 
     @JsonIgnore
@@ -54,19 +54,19 @@ public class UserModel extends RepresentationModel<UserModel> implements Seriali
     @Column(length = 255)
     private String imageUrl;
 
-   // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+    //    @JsonFormat(shape = JsonFormat.Shape.STRING,pattern = "dd-MM-yyyy HH:mm:ss")
     @Column(nullable = false)
     private LocalDateTime creationDate;
 
-   // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
+    //    @JsonFormat(shape = JsonFormat.Shape.STRING,pattern = "dd-MM-yyyy HH:mm:ss")
     @Column(nullable = false)
     private LocalDateTime lastUpdateDate;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private Set<UserCourseModel> userCourses;
+    private Set<UserCourseModel> usersCourses;
 
-    public UserCourseModel convertToUserCourseModel(UUID courseId) {
+    public UserCourseModel convertToUserCourseModel(UUID courseId){
         return new UserCourseModel(null, courseId, this);
     }
 }
