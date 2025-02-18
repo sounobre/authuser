@@ -6,4 +6,3 @@ import java.util.UUID;
 
 public record InstructorRecordDto(@NotNull(message = "UserId is mandatory") UUID userId) {
 }
-

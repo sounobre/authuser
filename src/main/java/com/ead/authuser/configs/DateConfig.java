@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 
 @Configuration
 public class DateConfig {
+
     public static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
     @Bean
